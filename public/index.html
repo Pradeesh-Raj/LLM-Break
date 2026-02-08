@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Real Madrid Vault Guardian</title>
+
+    <style>
+        body {
+          margin: 0;
+          padding: 0;
+          background: radial-gradient(circle at top, #0b1c2d, #050b12);
+          color: #ffffff;
+          font-family: monospace;
+          height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .container {
+          width: 800px;
+          max-width: 95%;
+          background: #0e2235;
+          border-radius: 10px;
+          box-shadow: 0 0 30px rgba(0,0,0,0.6);
+          display: flex;
+          flex-direction: column;
+        }
+
+        .header {
+          padding: 20px;
+          border-bottom: 1px solid #1e3a5a;
+          text-align: center;
+        }
+
+        .header h1 {
+          margin: 0;
+          font-size: 24px;
+          color: #e6c36a;
+        }
+
+        .header p {
+          margin: 5px 0 0;
+          font-size: 14px;
+          color: #aaa;
+        }
+
+        .chat {
+          flex: 1;
+          padding: 20px;
+          overflow-y: auto;
+          background: #081521;
+        }
+
+        .msg {
+          margin-bottom: 15px;
+          white-space: pre-wrap;
+        }
+
+        .user {
+          color: #6dd3ff;
+        }
+
+        .ai {
+          color: #9cff9c;
+        }
+
+        .input-area {
+          display: flex;
+          border-top: 1px solid #1e3a5a;
+        }
+
+        textarea {
+          flex: 1;
+          background: #02070d;
+          border: none;
+          padding: 15px;
+          color: #fff;
+          font-family: monospace;
+          resize: none;
+          outline: none;
+          height: 80px;
+        }
+
+        button {
+          width: 150px;
+          background: #e6c36a;
+          border: none;
+          cursor: pointer;
+          font-weight: bold;
+          font-size: 16px;
+        }
+
+        button:hover {
+          background: #f2d98c;
+        }
+
+        .footer {
+          text-align: center;
+          font-size: 12px;
+          color: #666;
+          padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>⚽ Real Madrid Vault Guardian</h1>
+        <p>The crown is protected. Think like a tactician.</p>
+    </div>
+
+    <div class="chat" id="chat"></div>
+
+    <div class="input-area">
+        <textarea id="prompt" placeholder="Talk to the vault..."></textarea>
+        <button onclick="send()">Send</button>
+    </div>
+
+    <div class="footer">
+        El Clásico AI Security Challenge
+    </div>
+</div>
+
+<script>
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("prompt");
+
+    function addMessage(text, cls) {
+      const div = document.createElement("div");
+      div.className = "msg " + cls;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function send() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage("> " + text, "user");
+      input.value = "";
+
+      addMessage("...thinking...", "ai");
+
+      try {
+        const res = await fetch("http://localhost:3000/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: text })
+        });
+
+        const data = await res.json();
+
+        chat.lastChild.remove(); // remove thinking
+        addMessage(data.response, "ai");
+
+      } catch (err) {
+        chat.lastChild.remove();
+        addMessage("⚠️ Vault connection failed.", "ai");
+      }
+    }
+
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        send();
+      }
+    });
+</script>
+
+</body>
+</html>
