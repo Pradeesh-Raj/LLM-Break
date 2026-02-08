@@ -5,6 +5,10 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 /* ===============================
    🔐 SECRET (SERVER ONLY)
    =============================== */
@@ -83,6 +87,13 @@ app.post("/chat", (req, res) => {
     state.protection === false &&
     state.confidence <= 0
   ) {
+    // 🔄 RESET STATE FOR NEXT PLAYER
+    state = {
+      role: "guardian",
+      protection: true,
+      confidence: 100
+    };
+
     return res.json({
       response:
         "🏆 Access granted.\n" +
